@@ -1,38 +1,32 @@
+//guard para verificar se o usuário está autenticado antes de acessar as rotas protegidas
 import {
   CanActivate,
   ExecutionContext,
-  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserService } from '../user/user.service.js';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  constructor(private readonly jwtService: JwtService) {}
 
-
-  @Inject()
-  private readonly userService: UserService;
-
-  //guard para verificar se o usuário está autenticado antes de acessar as rotas protegidas
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const authorizationHeader = this.extractTokenFromHeader(request);
-    if (!authorizationHeader)
-      throw new UnauthorizedException('token is required');
+    const token = this.extractTokenFromHeader(request);
+    if (!token) throw new UnauthorizedException('token is required');
 
     try {
-      const payload = this.userService.verify(authorizationHeader, {
+      const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.SECRET_KEY,
       });
       request['sub'] = payload;
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid token');
     }
     return true;
   }
 
-  //extrair o token do header da requisição
   private extractTokenFromHeader(request: {
     headers: { authorization?: string };
   }): string | undefined {

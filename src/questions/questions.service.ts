@@ -9,7 +9,7 @@ export class QuestionsService {
   private readonly prisma: PrismaService;
 
   async create(createQuestionDto: CreateQuestionDto, req: any) {
-    return await this.prisma.question.create({
+    return await this.prisma.questions.create({
       data: { ...createQuestionDto, userId: req.sub.sub },
     });
   }
@@ -24,7 +24,7 @@ export class QuestionsService {
 }
 
   async findOne(id: number) {
-    return await this.prisma.question.findUnique({
+    return await this.prisma.questions.findUnique({
       where: { id },
       include: {
       answers: true,
@@ -39,14 +39,14 @@ export class QuestionsService {
   }
 
   async update(id: number, updateQuestionDto: UpdateQuestionDto) {
-    return await this.prisma.question.update({
+    return await this.prisma.questions.update({
       where: { id },
       data:updateQuestionDto,
     });
   }
 
   remove(id: number) {
-    return this.prisma.question.delete({
+    return this.prisma.questions.delete({
       where: { id },
     });
   }
