@@ -12,6 +12,7 @@ export class AuthService {
     @Inject()
     private readonly userService: UserService;
 
+    // Signin metodo restornando o token JWT senha == varios numeros / varios numeros == senha criptografada no banco de dados
     async signin(
         params: Prisma.UserCreateInput
     ): Promise<{access_token:String}> {

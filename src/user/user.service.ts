@@ -6,6 +6,9 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
+  verify(authorizationHeader: string, p0: { secret: string | undefined; }) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     private readonly prisma: PrismaService,
   ) {}
