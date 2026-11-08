@@ -6,6 +6,9 @@ import { DatabaseModule } from '../database/database.module.js';
 @Module({
   imports: [DatabaseModule],
   controllers: [UserController],
-  providers: [UserService]
+  providers: [UserService],
+
+  
+  exports: [UserService],
 })
 export class UserModule {}
