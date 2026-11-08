@@ -4,9 +4,10 @@ import { AuthService } from './auth.service.js';
 import { UserModule } from '../user/user.module.js';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from './auth.guard.js';
+import { DatabaseModule } from '../database/database.module.js';
 
 @Module({
-  imports: [forwardRef(() => UserModule),JwtModule.register({
+  imports: [DatabaseModule ,forwardRef(() => UserModule),JwtModule.register({
     global: true,
     secret: process.env.SECRET_KEY,
     signOptions: { expiresIn: '1h' },

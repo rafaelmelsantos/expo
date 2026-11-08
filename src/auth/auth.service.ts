@@ -1,8 +1,8 @@
 import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma} from '../generated/prisma/browser.js';
-import { UserService } from '../user/user.service.js';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from '../database/prisma.service.js';
 
 @Injectable()
 export class AuthService {
@@ -10,13 +10,15 @@ export class AuthService {
     private readonly jwtService: JwtService;
 
     @Inject()
-    private readonly userService: UserService;
+    private readonly prisma: PrismaService;
 
     // Signin metodo restornando o token JWT senha == varios numeros / varios numeros == senha criptografada no banco de dados
     async signin(
         params: Prisma.UserCreateInput
     ): Promise<{access_token:String}> {
-       const user = await this.userService.user({ email: params.email });
+       const user = await this.prisma.user.findUnique({
+         where: { email: params.email }
+       });
        if(!user) throw new NotFoundException('User not found');
        const passwordMatch = await bcrypt.compare(params.password, user.password);
         if(!passwordMatch) throw new UnauthorizedException('Invalid credentials');

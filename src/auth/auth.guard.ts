@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
       const payload = this.userService.verify(authorizationHeader, {
         secret: process.env.SECRET_KEY,
       });
-      request.userId = payload;
+      request['sub'] = payload;
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }

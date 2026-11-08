@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
-import { PrismaClient, Prisma } from '../generated/prisma/client.js';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service.js';
 import { UserModel } from '../generated/prisma/models.js';
 import { AuthGuard } from '../auth/auth.guard.js';
+import { CreateUserDto } from './dto/createUser.dto.js';
+import { UpdateUserDto } from './dto/updateUser.dto.js';
 
 //rota principal
 @Controller('user')
@@ -11,26 +12,27 @@ export class UserController {
 
   //rota para criar usuário
   @Post()
-  async create(@Body() userData: Prisma.UserCreateInput): Promise<UserModel> {
-    return this.usersService.createUser(userData);
+  async create(
+    @Body(new ValidationPipe()) CreateUserDto: CreateUserDto): Promise<UserModel> {
+    return this.usersService.createUser(CreateUserDto);
   }
 
   //rota para buscar usuário por id
   @UseGuards(AuthGuard)
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<UserModel | null> {
-    return this.usersService.user({ id: Number(id) });
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Omit<UserModel, 'password'> | null> {
+    return this.usersService.user({ id });
   }
 
   //rota para atualizar usuário por id
   @UseGuards(AuthGuard)
-  @Put(':id')
+  @Patch(':id')
   async update(
-    @Param('id') id: string,
-    @Body() userData: Prisma.UserUpdateInput,
+    @Param('id',ParseIntPipe) id: number,
+    @Body(new ValidationPipe()) userData: UpdateUserDto,
   ): Promise<UserModel> {
     return this.usersService.updateUser({
-      where: { id: Number(id) },
+      where: { id },
       data: userData,
     });
   }
